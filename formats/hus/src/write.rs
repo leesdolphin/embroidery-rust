@@ -21,6 +21,11 @@ impl PatternWriter for HusVipPatternWriter {
         _: &embroidery_lib::Pattern,
         _: &mut dyn std::io::Write,
     ) -> std::result::Result<(), embroidery_lib::errors::write::Error> {
-        todo!()
+        let _magic = self.mode.magic_bytes();
+        if self.mode == PatternType::Hus {
+            todo!()
+        } else {
+            todo!()
+        }
     }
 }

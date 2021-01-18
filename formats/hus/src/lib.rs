@@ -27,7 +27,8 @@ impl PatternFormat for HusPatternFormat {
         Some(Box::from(HusVipPatternReader::default()))
     }
     fn writer(&self) -> Option<Box<dyn PatternWriter>> {
-        Some(Box::from(HusVipPatternWriter::hus()))
+        None
+        // Some(Box::from(HusVipPatternWriter::hus()))
     }
 }
 #[derive(Default)]
@@ -44,6 +45,7 @@ impl PatternFormat for VipPatternFormat {
         Some(Box::from(HusVipPatternReader::default()))
     }
     fn writer(&self) -> Option<Box<dyn PatternWriter>> {
-        Some(Box::from(HusVipPatternWriter::vip()))
+        None
+        // Some(Box::from(HusVipPatternWriter::vip()))
     }
 }

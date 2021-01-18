@@ -61,12 +61,15 @@ fn build_header(pattern: &Pattern, dst_stitches: &[StitchInformation]) -> Result
     let stitch_count = dst_stitches.len();
     let (minx, miny, maxx, maxy) = pattern.get_bounds();
 
-    let title = pattern.name.to_string();
+    let title = char_truncate(&c_trim(&pattern.name), 17);
 
-    write!(data, "LA:{: <17}\r", char_truncate(&c_trim(&title), 17))?;
+    let title_padding: String = std::iter::repeat(' ').take(17 - title.bytes().len()).collect();
+
+    // Cannot use `{: >17}` as it does not handle multi-byte characters in the way we need to
+    write!(data, "LA:{}{}\r", title, title_padding)?;
     write!(data, "ST:{: >7}\r", stitch_count)?;
     // `CO` represents the number of color changes.
-    write!(data, "CO:{: >3}\r", color_count - 1)?;
+    write!(data, "CO:{: >3}\r", color_count.saturating_sub(1))?;
     write!(data, "+X:{: <5}\r", (10. * maxx) as i64)?;
     write!(data, "-X:{: <5}\r", (10. * minx) as i64)?;
     write!(data, "+Y:{: <5}\r", (10. * maxy) as i64)?;
@@ -78,9 +81,6 @@ fn build_header(pattern: &Pattern, dst_stitches: &[StitchInformation]) -> Result
     write!(data, "MX:{: <+6}\r", 0)?;
     write!(data, "MY:{: <+6}\r", 0)?;
     write!(data, "PD:{: <6}\r\0\0\0", ['*'; 6].iter().collect::<String>())?;
-
-    debug!("{:?}", String::from_utf8_lossy(&data));
-    debug!("{:?}", data.len());
 
     assert!(data.len() == 128);
     Ok(data)
@@ -139,7 +139,6 @@ fn into_dst_stitches(pattern: &Pattern) -> Result<Vec<StitchInformation>, WriteE
                     inter_group_jumps.push(StitchInformation::Move(0, 0, StitchType::Stop))
                 }
             }
-            debug!("Jumps: {:?}", &inter_group_jumps);
             re.append(&mut inter_group_jumps);
             for s in iter {
                 let dx = ((s.x * 10.).trunc() as i32) - ox;
@@ -150,12 +149,6 @@ fn into_dst_stitches(pattern: &Pattern) -> Result<Vec<StitchInformation>, WriteE
                         Some(idx),
                         "Stitch jump is too big for the format",
                     ));
-                }
-                if idx < 10 {
-                    debug!(
-                        "Start: ({}, {}); Stitch: {:?}; Move: ({}, {}); Dest: ({}, {});",
-                        ox, oy, s, dx, dy, ox, oy
-                    );
                 }
                 ox += dx;
                 oy += dy;
@@ -184,8 +177,6 @@ fn safe_jump_to(ox: i32, oy: i32, s: &Stitch) -> Vec<StitchInformation> {
     let delta_x = ((s.x * 10.) as i32) - ox;
     let delta_y = ((s.y * 10.) as i32) - oy;
 
-    debug!("Target: ({}, {});", delta_x, delta_y);
-
     if delta_x == 0 && delta_y == 0 {
         Vec::new()
     } else if delta_x.abs() <= MAX_JUMP && delta_y.abs() <= MAX_JUMP {
@@ -206,10 +197,6 @@ fn safe_jump_to(ox: i32, oy: i32, s: &Stitch) -> Vec<StitchInformation> {
         let mut cx = 0;
         let mut cy = 0;
         let mut re = Vec::with_capacity(chunks as usize);
-        debug!(
-            "Abs: ({}, {}); Signs: ({}, {}); Chunks: {}; Jump: ({}, {})",
-            abs_x, abs_y, sign_x, sign_y, chunks, step_x, step_y
-        );
         for i in 0..=chunks {
             let (nx, ny) = (i32::min(abs_x, i * step_x), i32::min(abs_y, i * step_y));
             re.push(StitchInformation::Move(
@@ -217,15 +204,6 @@ fn safe_jump_to(ox: i32, oy: i32, s: &Stitch) -> Vec<StitchInformation> {
                 sign_y * (ny - cy) as i8,
                 StitchType::Jump,
             ));
-            debug!(
-                "C: ({}, {}); N: ({}, {}), move: ({}, {})",
-                cx,
-                cy,
-                nx,
-                ny,
-                sign_x * (cx - nx) as i8,
-                sign_y * (cy - ny) as i8
-            );
             cx = nx;
             cy = ny;
         }
@@ -241,4 +219,23 @@ fn generate_cut() -> Vec<StitchInformation> {
         StitchInformation::Move(-1, 0, StitchType::Jump),
         StitchInformation::Move(0, 0, StitchType::Jump),
     ]
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_build_header() {
+        let result = build_header(
+            &Pattern {
+                name: "Ä".to_owned(),
+                attributes: vec![],
+                color_groups: vec![],
+            },
+            &[],
+        )
+        .unwrap();
+
+        assert_eq!("LA:Ä               \rST:      0\rCO:  0\r+X:0    \r-X:0    \r+Y:0    \r-Y:0    \rAX:+0    \rAY:+0    \rMX:+0    \rMY:+0    \rPD:******\r\u{0}\u{0}\u{0}", String::from_utf8(result).unwrap());
+    }
 }

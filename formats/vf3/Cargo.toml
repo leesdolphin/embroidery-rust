@@ -1,8 +1,0 @@
-[package]
-name = "embroidery-fmt-vf3"
-version = "0.1.0"
-authors = ["Opal Symes <code@opal.codes>"]
-edition = "2018"
-
-[dependencies]
-embroidery-lib = { path = "../../embroidery-lib" }

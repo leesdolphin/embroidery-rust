@@ -2,8 +2,8 @@ use std::io::Read;
 use std::iter::FromIterator;
 
 use embroidery_lib::format::PatternReader;
-use embroidery_lib::utils::ReadByteIterator;
 use embroidery_lib::prelude::*;
+use embroidery_lib::utils::ReadByteIterator;
 
 pub struct CsvPatternReader {}
 
@@ -109,7 +109,7 @@ fn read_header_item(mut header_iter: &mut dyn Iterator<Item = u8>) -> Result<Par
         b"MX" => Ok(ParseResult::Skip),
         b"MY" => Ok(ParseResult::Skip),
         b"PD" => Ok(ParseResult::Skip),
-        _ => Ok(ParseResult::Some(PatternAttribute::Arbitary(
+        _ => Ok(ParseResult::Some(PatternAttribute::Arbitrary(
             String::from_utf8_lossy(header).to_string(),
             String::from_utf8_lossy(content).to_string(),
         ))),
@@ -202,14 +202,14 @@ fn read_stitches(item: &mut dyn Iterator<Item = u8>) -> Result<Vec<ColorGroup>, 
                     debug!("Irregular {:?} {:?} {:?}", cx, cy, stitch_type);
                     last_irregulars.push((cx, cy, stitch_type));
                 }
-            },
+            }
             ParseResult::Some(StitchInformation::End) => {
                 break;
-            },
+            }
             ParseResult::Exhausted => {
                 break;
-            },
-            ParseResult::Skip => {},
+            }
+            ParseResult::Skip => {}
         }
     }
     if !stitches.is_empty() {

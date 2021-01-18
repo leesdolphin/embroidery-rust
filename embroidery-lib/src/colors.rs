@@ -34,6 +34,18 @@ impl From<palette::Srgb> for Color {
     }
 }
 
+impl From<Color> for [u8; 3] {
+    fn from(color: Color) -> Self {
+        [color.red, color.green, color.blue]
+    }
+}
+
+impl From<[u8; 3]> for Color {
+    fn from(color: [u8; 3]) -> Self {
+        Self::rgb(color[0], color[1], color[2])
+    }
+}
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "#{:02X}{:02X}{:02X}", self.red, self.green, self.blue)

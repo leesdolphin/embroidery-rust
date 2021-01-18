@@ -123,7 +123,7 @@ fn read_header_item(mut header_iter: &mut dyn Iterator<Item = u8>) -> Result<Par
         b"MX" => Ok(ParseResult::Skip),
         b"MY" => Ok(ParseResult::Skip),
         b"PD" => Ok(ParseResult::Skip),
-        _ => Ok(ParseResult::Some(PatternAttribute::Arbitary(
+        _ => Ok(ParseResult::Some(PatternAttribute::Arbitrary(
             String::from_utf8_lossy(header).to_string(),
             String::from_utf8_lossy(content).to_string(),
         ))),

@@ -25,6 +25,7 @@ impl JefHoop {
             other => JefHoop::Other(other),
         }
     }
+    #[allow(dead_code)]
     pub fn to_bytes(&self) -> u32 {
         match self {
             JefHoop::Hoop50x50 => HOOP_50X50,
@@ -35,6 +36,7 @@ impl JefHoop {
             JefHoop::Other(code) => *code,
         }
     }
+    #[allow(dead_code)]
     pub fn hoop_size(self) -> Option<(f64, f64)> {
         match self {
             JefHoop::Hoop50x50 => Some((50.0, 50.0)),

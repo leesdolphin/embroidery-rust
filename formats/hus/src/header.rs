@@ -127,6 +127,7 @@ impl PatternHeader {
         (self.y_offset as usize) - (self.x_offset as usize)
     }
 
+    #[allow(dead_code)]
     pub fn write(&self, file: &mut dyn Write) -> Result<()> {
         file.write_all(&self.pattern_type.magic_bytes())?;
         file.write_u32::<LittleEndian>(self.number_of_stitches)?;

@@ -116,6 +116,8 @@ impl StitchType {
             StitchType::Regular => StitchType::Stop,
         }
     }
+
+    #[allow(dead_code)]
     pub fn with_jump(self) -> Self {
         match self {
             StitchType::Stop => StitchType::JumpStop,

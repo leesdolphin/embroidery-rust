@@ -67,7 +67,7 @@ fn write_vars(pattern: &Pattern, writer: &mut dyn Write) -> Result<(), WriteErro
     writeln!(writer)?;
     for attr in pattern.attributes.iter() {
         match attr {
-            PatternAttribute::Arbitary(key, value) => {
+            PatternAttribute::Arbitrary(key, value) => {
                 write_csv_var!(writer, key, value)?;
             },
             PatternAttribute::Title(value) => {

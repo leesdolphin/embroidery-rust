@@ -6,7 +6,7 @@ use crate::transforms::{RemoveDuplicateStitches, SplitLongStitches};
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[allow(clippy::module_name_repetitions)]
 pub enum PatternAttribute {
-    Arbitary(String, String),
+    Arbitrary(String, String),
     Title(String),
     Author(String),
     Copyright(String),
